@@ -54,7 +54,7 @@ var mail = $('#email').val();
 
 
 $('#username').keyup(function(){
-  if ($(this).val().length =="" ){
+  if ($(this).val().length < 3 ){
     $(this).css({
       borderColor :'red',
       color :'red'
@@ -71,7 +71,7 @@ $('#username').keyup(function(){
 });
 
 $('#oldPassword').keyup(function(){
-if ($(this).val().length == "") { // Si la chaie de caractère est egale à 0
+if ($(this).val().length < 8 ) { // Si la chaie de caractère est egale à 0
 $(this).css({
   borderColor :'red',
   color :'red'
@@ -139,30 +139,27 @@ $('#newPassword2').keyup(function(){
   }
   });
 
-/*
-$('#login-submit').click(function() {
-if ($('#username').val().length == "" || $('#oldPassword').val().length == "" || $('#newPassword1').val().length == "" 
-  || $('#newPassword1').val().length < 8 || $('#newPassword2').val().length == "" || $('#newPassword1').val() != $('#newPassword2').val() ) {
-  alert("Veuillez renseigner tous les champs recquis");
+$('#login-submit').click(function(e) {
+  e.preventDefault();
+var donnees = $('#login-form').serialize();
+  $.ajax({
+        url: 'connexion1.php',
+        type: 'post',
+        data : donnees,
+        dataType: 'text' ,
+        success : function(data) {
+          if(data == "success") {
+            $(messages4).html("<p> Votre mot de passe à étté modifié avec succès</p>");
 } else {
-  alert("everything ok");
+            $('#messages4').css("color", "red").html(data);
+            exit();
+          
 }
-*/
-
-$('#login-submit').click(function() {
-if ($('#username').val().length == "" || $('#oldPassword').val().length == "" || $('#newPassword1').val().length == "" 
-  || $('#newPassword1').val().length < 8 || $('#newPassword2').val().length == "") {
-  alert("Veuillez renseigner tous les champs recquis");
-} else if ($('#newPassword1').val() != $('#newPassword2').val()) {
-  alert("Les mots de passe renseignés ne sont pas identiques");
-} else {
-  alert("everything ok");
-}
-
-});
-
+        }
+      });
+    });
 $('#prenom').keyup(function() {
-  if ($(this).val().length == "") { // Si la chaie de caractère est egale à 0 on rend le cahmps rouge
+  if ($(this).val().length == "") { // Si la chaine de caractère est egale à 0 on rend le champs rouge
 $(this).css({
   borderColor :'red',
   color :'red'
@@ -234,7 +231,7 @@ $('#password-request').click(function(e) {
     /*  var prenom = $('#prenom').val();
       var nom = $('#nom').val();
       var mail = $('#mail').val(); */
-      var donnees = $("#register-form").serialize();
+      var donnees = $('#register-form').serialize();
         $.ajax({
         url: 'connexion.php',
         type: 'post',
@@ -250,5 +247,4 @@ $('#password-request').click(function(e) {
         }
       });
     });
-   });
-  
+});

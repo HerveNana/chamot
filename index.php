@@ -6,7 +6,7 @@ ini_set('log_errors', 1);
 // Nom du fichier qui enregistre les logs (attention aux droits à l'écriture)
 ini_set('error_log', dirname(__file__) . '/log_error_php.txt');
 // Afficher les erreurs et les avertissements
-error_reporting(e_all);
+error_reporting('e_all');
 // Afficher les erreurs à l'écran
 ini_set('display_errors', 1);
 // Enregistrer les erreurs dans un fichier de log
@@ -59,7 +59,7 @@ require ("header.php");
                                             <input type="text" id="username" class="form-control" name="username" tabindex="1" placeholder="Login" >
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" id="oldPassword" class="form-control" name="password" tabindex="2" placeholder="Ancien mot de passe">
+                                            <input type="password" id="oldPassword" class="form-control" name="password" tabindex="2" placeholder="Mot de passe actuel">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" id="newPassword1" class="form-control" name="newPassword1" tabindex="3" placeholder="Nouveau mot de passe">
@@ -85,14 +85,24 @@ require ("header.php");
 
                   <div class="form-group">
                     <input type="text" name="nom" id="nom" tabindex="7" class="form-control" placeholder="Nom (tel qu'orthographié sur votre carte d'étudiant)" value="">
+
                   </div>
 
                   <div class="form-group">
                     <input type="email" name="mail" id="mail" tabindex="8" class="form-control" placeholder="Adresse email personnelle (fournie lors de l'inscription)" value="">
                   </div>
+                  <div class="form-group" id ="uiduser" style="display: none;" >
+                    <input type="hidden" name="compteutil" id="compteutil" tabindex="9" class="form-control" placeholder="Selectionnez le compte à modifier" >
+                    <select name = "account" id="uiduser">
+                      <option name = "elected" value="">Selectionnez un compte</option>
+                      <option name = "compte_etudiant" value="compte_etudiant">Etudiant </option>
+                      <option name = "compte_professionnel" value="compte_professionnel">Employé / Enseignant</option>
+                      <option name = "compte_vacataire" value="compte_vacataire">Vacataire</option>
+                    </select>
+                  </div>
 
             <!--      <div class="form-group">
-                    <input type="pasolsword" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                    <input type="pasolsword" name="password" id="password" tabindexs="2" class="form-control" placeholder="Password">
                   </div>
                   <div class="form-group">w
                     <input type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
@@ -129,7 +139,7 @@ require ("header.php");
         <div class="row">
             <div class="col-md6 col-md-offset-3">
                 <div class="panel panel-login" id="panel-password-warning" style="display: block;">
-                    <div  class="panel-body" >
+                    <div  class="panel-body">
                       <div class="active">
                         <div class="row">
                             <div class="col-lg-12">
@@ -137,7 +147,7 @@ require ("header.php");
                              <p id="messages1"><span class="tippedMessages">Veuillez renseigner votre ancien mot de passe</span></p>
                              <p id="messages2"><span class="tippedMessages">Nouveau mot de passe 8 caractères minimum</span></p>
                              <p id="messages3"><span class="tippedMessages">Nouveaux mots de passe identiques</span></p>
-                             <p id="messages4"></p>
+                             <p id="messages4"><span class="tippedMessages"></span></p>
                              <p id="messages5"><span class="tippedMessages"></span></p>
                            </div>
                          </div>

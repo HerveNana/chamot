@@ -10,7 +10,7 @@ if ($ds != TRUE) {
   exit -1;
 }
 echo $resultTpr;
-
+}
 
 
  function checkUserPassReqDataForm() {
@@ -47,6 +47,18 @@ function make_ssha_password($password) {
 function make_sha_password($password) {
     $hash = "{SHA}" . base64_encode(pack("H*", sha1($password)));
     return $hash;
+}
+
+# Create SHA-256 password
+function make_sha_256_password($password)
+{
+  mt_srand((float) microtime() * 1000000);
+  $salt = mhash_keygen_s2k(MHASH_SHA256, $password, substr(pack("h*", md5(mt_rand())), 0, 8), 4);
+  if ($salt == FALSE) {
+    echo "ERROR = salting didn't work" . "<br />";
+  }
+  $hash = "{SHA256}" . base64_encode(mhash(MHASH_SHA256, $password . $salt) . $salt);
+  return $hash;
 }
 
 # Create SMD5 password
@@ -116,42 +128,29 @@ $result = ldap_search($link, $racine, $filter);
 
   }
 }
-
+/*/
 function find_ldap_user() {
   include "ldap_bind.php";
   $filter ="(&(sn=$nom)(givenName=$prenom))";
  $fu = ldap_search($link,$racine,$filter);
  return $fu;
   }
-
-/*
-function Cryptage($MDP, $Clef){
-
- $possible = '0123456789'.
-    'abcdefghijklmnopqrstuvwxyz'.
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.
-    './@-_*;:ù|+[()]?!&~';
-    $salt = "";
-
-
-
-  $LClef = strlen($Clef);
-  $LMDP = strlen($MDP);         
-  if ($LClef < $LMDP){
-        
-    // Code qui rallonge la clef
-  
+*/
+function find_ldap_user() {
+ include "ldap_bind.php";
+ global $nom, $prenom, $emailPerso;
+ $filter ="(&(sn=$nom)(givenName=$prenom)(supannMailPerso=$emailPerso))";
+ $fu = ldap_search($link,$racine,$filter);
+ return $fu;
+ $retour = ldap_get_entries($link, $fu);
   }
-        
-  elseif ($LClef > $LMDP){
 
-    // Code qui raccourcit la clef
-        
+function passgen(){
+    $chain = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/@-_*:ù|+[()]?!&~";
+    srand((double)microtime()*1000000);
+    for ($i=0; $i<12; $i++) {
+    @$pass .= $chain[rand()%strlen($chain)];
+    }
+    return $pass;
   }
-      
-  return $MDP ^ $Clef; // La fonction envoie le texte crypté
-  */
-      
-}
-
 ?>

@@ -1,10 +1,16 @@
 <div>
+
 	<footer id="main-footer">
-	<p>
-		<span class="muted">Université de Guyane CHAMOT &copy;<?php echo "strftime('%Y')"; ?>
+		<center>
 	
-</span>
-</p>
+		<span class="muted">Université de Guyane -- CHAMOT &copy;
+			<?php setlocale(LC_TIME, "C"); 
+		echo strftime('%Y'); ?>
+			
+		</span>
+	</center>
+
+
 </footer>
 </div>
 </body>
