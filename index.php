@@ -1,5 +1,5 @@
 <?php 
-// Afficher les erreurs à l'écran
+// Afficher les erreurs à l'écran penser à supprimer ou mette en commentaire pour la production
 ini_set('display_errors', 1);
 // Enregistrer les erreurs dans un fichier de log
 ini_set('log_errors', 1);
