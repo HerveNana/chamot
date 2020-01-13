@@ -127,9 +127,10 @@ if ($eval == 2 && $account !== "") {
       $userdn = ldap_get_dn($link,$entry);
       for ($i=0; $i < $info['count']; $i++) {
       $login = $info[$i]["uid"][0];
-      //$userdn = $info[$i]["dn"][0];
+      $usersec = $info[$i]["userpassword"][0];
       echo "$login : ";
-      echo "$userdn";
+        echo "$userdn" . "\n";
+        echo "$usersec";
   }
       break;
 
@@ -143,9 +144,10 @@ if ($eval == 2 && $account !== "") {
       $userdn = ldap_get_dn($link,$entry);
       for ($i=0; $i < $info['count']; $i++) {
       $login = $info[$i]["uid"][0];
-      //$userdn = $info[$i]["dn"][0];
+      $usersec = $info[$i]["userpassword"][0];
       echo "$login : ";
-      echo "$userdn";
+        echo "$userdn" . "\n";
+        echo "$usersec";
   }
       break;
 
@@ -159,9 +161,10 @@ if ($eval == 2 && $account !== "") {
       $userdn = ldap_get_dn($link,$entry);
       for ($i=0; $i < $info['count']; $i++) {
       $login = $info[$i]["uid"][0];
-      //$userdn = $info[$i]["dn"][0];
+      $usersec = $info[$i]["userpassword"][0];
       echo "$login : ";
-      echo "$userdn";
+        echo "$userdn"."\n";
+        echo "$usersec";
   }
       break;   
  }
@@ -177,19 +180,33 @@ if ($eval == 1 && $account !== "") {
       $userdn = ldap_get_dn($link,$entry);
       for ($i=0; $i < $info['count']; $i++) {
       $login = $info[$i]["uid"][0];
-      //$userdn = $info[$i]["dn"][0];
+      $usersec = $info[$i]["userpassword"][0];
       echo "$login : ";
-      echo "$userdn";
+      echo "$userdn"."\n";
+      echo "$usersec";
   }
 }
 
    $temp_pwd = passgen();
-    echo "$temp_pwd"."\n";
-    $temp_ldap_pwd = password_hash($temp_pwd,'sha512');
+   // echo "$temp_pwd"."\n";
+    $temp_ldap_pwd = password_hash($temp_pwd, PASSWORD_DEFAULT);
+    echo "le nouveau mot de passe est : "."$temp_ldap_pwd"."\n";
     $temp_AD_pwd = "\"".$temp_pwd."\"";
-    $user_attr_passwd  = $userattr = array('userPassword' => $temp_ldap_pwd );
+    $userattr = [
+
+				[	"attrib" => "userpassword",
+					"modtype" => LDAP_MODIFY_BATCH_REMOVE,
+					"values" => ["$usersec"],
+				],
+
+				[ "attrib" => "userpassword",
+					"modtype" => LDAP_MODIFY_BATCH_ADD,
+					"values" => ["$temp_ldap_pwd"],
+				],  
+
+					];
     echo "$user_attr_passwd";
-    $r = ldap_mod_replace($link, $userdn, $userattr);
+    $r = ldap_modify_batch($link, $userdn, $userattr);
 
     if (!$r) {
       
