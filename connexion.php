@@ -216,6 +216,7 @@ if ($eval == 1 && $account !== "") {
     } else {
       $result = $messages['passwordreset'];
       echo "$result";
+      echo "$result";
 
     }
 
