@@ -94,7 +94,9 @@ if ($passwordalg == "ssha") {
 	$Password = $hash;
 }
 */
-$hash_password = make_sha_256_password($password);
+//$hash_password = make_sha_256_password($password);
+//$Password = $hash_password;
+$hash_password = password_hash($password,CRYPT_SHA512);
 $Password = $hash_password;
 
 /*
@@ -116,7 +118,20 @@ $filter ="(|(uid=$username))";
         $oldPassword = $retour[$i]["userpassword"][0];
         echo "l'ancien mot de passe est :"."$oldPassword"."\n"."\n";
     }
-  		 if ($Password == $oldPassword) {
+    if (password_verify($password,$oldPassword)) {
+
+    $renewPassword = hash('sha256', $newPassword1);
+    $renewPassword = $Password;
+    $result = $messages['tokensent'];
+    echo "$result";
+  } else {
+    $result = $messages['wrongOldPassword'];
+    echo "$result" . "\n";
+    echo "$Password";
+    exit();
+  }
+}
+    /* if ($Password == $oldPassword) {
 			// $renewPassword = password_hash($newPassword1, 'sha512');
 			$renewPassword = hash('sha256', $newPassword1);
 			$renewPassword = $Password;
@@ -130,7 +145,7 @@ $filter ="(|(uid=$username))";
 			exit();
 		   }
   	}
-  
+  */
 
 //$temp_pwd = passgen();
   //  echo "$temp_pwd"."\n";
