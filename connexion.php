@@ -46,16 +46,7 @@ include "Ad_connect_2012.php";
 	    exit();
 	} 
 
-//Decclaration de fonctions:
-/*/function find_ldap_user() {
- include "ldap_bind.php";
- global $nom, $prenom, $emailPerso;
- $filter ="(&(sn=$nom)(givenName=$prenom)(supannMailPerso=$emailPerso))";
- $fu = ldap_search($link,$racine,$filter);
- return $fu;
- $retour = ldap_get_entries($link, $fu);
-  }
-*/
+//On vérifie la disponibilité des serveur LDAP et Active Directory
 
 $ping=exec('/bin/ping -c1 -q -w1 '.$ADserver.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
   sleep(1);
