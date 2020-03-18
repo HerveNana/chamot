@@ -13,200 +13,200 @@ error_reporting(E_ALL); */
 
 // Decclaration des variables
 
-include "ldap_bind.php";
-include "messages.php";
-include "functions.php";
-include "Ad_bind_2012.php";
-include "Ad_connect_2012.php";
+require "ldap_bind.php";
+require "messages.php";
+require "functions.php";
+require "Ad_bind_2012.php";
+require "Ad_connect_2012.php";
 
 
 //on recupere ensuite les données renseignées du formulaire dans des variables...
 // 1 - vérifie par acquis de consience que leqs champs on tous été renseignés... Dans le cas contraire on affecte àla variable result le message d'erreure approprié...
 
-		if (!empty($_POST['prenom']) && (!empty($_POST['nom']) && (!empty($_POST['mail'])))) {		
-		$prenom = $_POST['prenom'];
-		$nom = $_POST['nom'];
-		$emailPerso = $_POST['mail'];
+if (!empty($_POST['prenom']) && (!empty($_POST['nom']) && (!empty($_POST['mail'])))) {
+    $prenom = $_POST['prenom'];
+    $nom = $_POST['nom'];
+    $emailPerso = $_POST['mail'];
     $account = $_POST['account'];
-	//on fait de ces variables des vaiables de session...
-		$_SESSION["prenom"] = $prenom;
-		$_SESSION["nom"] = $nom;
-		$_SESSION["emailPerso"] = $emailPerso;
+    //on fait de ces variables des vaiables de session...
+    $_SESSION["prenom"] = $prenom;
+    $_SESSION["nom"] = $nom;
+    $_SESSION["emailPerso"] = $emailPerso;
     $_SESSION["account"] = $account;
   
-    // On retire les slashs rajoutés par PHP
-	//	$prenom = stripslashes($nom);
-		//$nom = stripslashes($prenom);
-		//$emailPerso = stripslashes($emailPerso);
-		//$word2 = stripslashes($newPassword2);
+     // On retire les slashs rajoutés par PHP
+     // $prenom = stripslashes($nom);
+    //$nom = stripslashes($prenom);
+    //$emailPerso = stripslashes($emailPerso);
+    //$word2 = stripslashes($newPassword2);
 
-	} else {
-		$result = $messages['completeinfo'];
-	    echo "$result"; 
-	    exit();
-	} 
+} else {
+    $result = $messages['completeinfo'];
+    echo "$result"; 
+    exit();
+} 
 
 //On vérifie la disponibilité des serveur LDAP et Active Directory
 
 $ping=exec('/bin/ping -c1 -q -w1 '.$ADserver.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
-  sleep(1);
-  if ($ping !=0) {
-  $result = $messages['noadserver']; 
+sleep(1);
+if ($ping !=0) {
+    $result = $messages['noadserver']; 
     echo "$result"; 
     exit();
-    }
-
-  if ($ADbind == false) {
-
-  $result = $messages['bindnotavailable'];
-  echo "$result";
-  exit();
 }
 
-	$ping=exec('/bin/ping -c1 -q -w1 '.$server.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
-	sleep(1);
-	if ($ping !=0) {
-	$result = $messages['noldapserver']; 
-  	echo "$result"; 
-  	exit();
-  	} 
+if ($ADbind == false) {
 
- $filter ="(&(sn=$nom)(givenName=$prenom))";
- $fu = ldap_search($link,$racine,$filter);
- $retour = ldap_get_entries($link, $fu);
- $eval = $retour["count"];
+    $result = $messages['bindnotavailable'];
+    echo "$result";
+    exit();
+}
+
+$ping=exec('/bin/ping -c1 -q -w1 '.$server.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
+sleep(1);
+if ($ping !=0) {
+    $result = $messages['noldapserver']; 
+     echo "$result"; 
+     exit();
+} 
+
+$filter ="(&(sn=$nom)(givenName=$prenom))";
+$fu = ldap_search($link, $racine, $filter);
+$retour = ldap_get_entries($link, $fu);
+$eval = $retour["count"];
  //echo($eval);
-  if ($eval==0) {
+if ($eval==0) {
     $result = $messages['usernotexist'];
     echo "$result";
     exit();
   
-  }  
-  
- $filter1 ="(&(sn=$nom)(givenName=$prenom)(supannMailPerso=$emailPerso))";
- $fu = ldap_search($link,$racine,$filter1);
- $retour = ldap_get_entries($link, $fu);
- $eval = $retour["count"];
-  if ($eval==0) {
-  	$result =$messages['nocorrectinfo'];
-  	echo "$result";
-  	exit();
-  }
+}  
 
-  if ($eval == 2 && $account == "") { // Si le compte sélectionné est un compte professionnel
-  
-echo "<script> $('#uiduser').addClass('active');
-               $('#uiduser').css({
-                display : 'block'
-              });
-              <!-- alert('test:".$account."'); -->
-     </script>";
-     $result = $messages['multipleaccount'];
-     echo "$result";
-     exit();
-  }
+$filter1 ="(&(sn=$nom)(givenName=$prenom)(supannMailPerso=$emailPerso))";
+$fu = ldap_search($link, $racine, $filter1);
+$retour = ldap_get_entries($link, $fu);
+$eval = $retour["count"];
+if ($eval==0) {
+    $result =$messages['nocorrectinfo'];
+    echo "$result";
+    exit();
+}
+
+if ($eval == 2 && $account == "") {  // Si le compte sélectionné est un compte professionnel
+    
+    echo "<script> $('#uiduser').addClass('active');
+    $('#uiduser').css({
+      display : 'block'
+      });
+      <!-- alert('test:".$account."'); -->
+      </script>";
+      $result = $messages['multipleaccount'];
+      echo "$result";
+      exit();
+}
 
 if ($eval == 2 && $account !== "") {
-  switch ($account) {
+      switch ($account) {
     case 'compte_professionnel':
-      $affiliation = 'staff';
-      $filter2 = "(&(sn=$nom)(givenName=$prenom)(eduPersonAffiliation=$affiliation))";
-      $user_entry_pro = ldap_search($link, $racine, $filter2);
-      $info = ldap_get_entries($link,$user_entry_pro);
-      $entry = ldap_first_entry($link,$user_entry_pro);
-      echo "entry :"."$entry"."\n";
-      $userdn = ldap_get_dn($link,$entry);
-      for ($i=0; $i < $info['count']; $i++) {
-      $login = $info[$i]["uid"][0];
-      $usersec = $info[$i]["userpassword"][0];
-      echo "$login : ";
-        echo "$userdn" . "\n";
-        echo "$usersec";
-  }
-      break;
+        $affiliation = 'staff';
+        $filter2 = "(&(sn=$nom)(givenName=$prenom)(eduPersonAffiliation=$affiliation))";
+        $user_entry_pro = ldap_search($link, $racine, $filter2);
+        $info = ldap_get_entries($link, $user_entry_pro);
+        $entry = ldap_first_entry($link, $user_entry_pro);
+        echo "entry :"."$entry"."\n";
+        $userdn = ldap_get_dn($link, $entry);
+        for ($i=0; $i < $info['count']; $i++) {
+            $login = $info[$i]["uid"][0];
+            $usersec = $info[$i]["userpassword"][0];
+             echo "$login : ";
+             echo "$userdn" . "\n";
+            echo "$usersec";
+        }
+        break;
 
-      case 'compte_vacataire':
-      $affiliation = 'affiliate';
-      $filter2 = "(&(sn=$nom)(givenName=$prenom)(eduPersonAffiliation=$affiliation))";
-      $user_entry_pro = ldap_search($link, $racine, $filter2);
-      $info = ldap_get_entries($link,$user_entry_pro);
-      $entry = ldap_first_entry($link,$user_entry_pro);
-      echo "entry :"."$entry"."\n";
-      $userdn = ldap_get_dn($link,$entry);
-      for ($i=0; $i < $info['count']; $i++) {
-      $login = $info[$i]["uid"][0];
-      $usersec = $info[$i]["userpassword"][0];
-      echo "$login : ";
-        echo "$userdn" . "\n";
-        echo "$usersec";
-  }
-      break;
+    case 'compte_vacataire':
+        $affiliation = 'affiliate';
+        $filter2 = "(&(sn=$nom)(givenName=$prenom)(eduPersonAffiliation=$affiliation))";
+        $user_entry_pro = ldap_search($link, $racine, $filter2);
+        $info = ldap_get_entries($link, $user_entry_pro);
+        $entry = ldap_first_entry($link, $user_entry_pro);
+        echo "entry :"."$entry"."\n";
+        $userdn = ldap_get_dn($link, $entry);
+        for ($i=0; $i < $info['count']; $i++) {
+            $login = $info[$i]["uid"][0];
+            $usersec = $info[$i]["userpassword"][0];
+            echo "$login : ";
+            echo "$userdn" . "\n";
+            echo "$usersec";
+        }
+        break;
 
     case 'compte_etudiant':
-      $affiliation = 'student';
-      $filter3 = "(&(sn=$nom)(givenName=$prenom)(eduPersonAffiliation=$affiliation))";
-      $user_entry_etu1 = ldap_search($link, $racine, $filter3);
-      $info = ldap_get_entries($link,$user_entry_etu1);
-      $entry = ldap_first_entry($link,$user_entry_etu1);
-      echo "entry :"."$entry"."\n";
-      $userdn = ldap_get_dn($link,$entry);
-      for ($i=0; $i < $info['count']; $i++) {
-      $login = $info[$i]["uid"][0];
-      $usersec = $info[$i]["userpassword"][0];
-      echo "$login : ";
-        echo "$userdn"."\n";
-        echo "$usersec";
-  }
-      break;   
- }
+        $affiliation = 'student';
+        $filter3 = "(&(sn=$nom)(givenName=$prenom)(eduPersonAffiliation=$affiliation))";
+        $user_entry_etu1 = ldap_search($link, $racine, $filter3);
+        $info = ldap_get_entries($link, $user_entry_etu1);
+        $entry = ldap_first_entry($link, $user_entry_etu1);
+        echo "entry :"."$entry"."\n";
+        $userdn = ldap_get_dn($link, $entry);
+        for ($i=0; $i < $info['count']; $i++) {
+            $login = $info[$i]["uid"][0];
+            $usersec = $info[$i]["userpassword"][0];
+            echo "$login : ";
+            echo "$userdn"."\n";
+            echo "$usersec";
+        }
+        break;   
+      }
 }
 
 if ($eval == 1 && $account !== "") {
       $affiliation = 'student';
       $filter4 = "(&(sn=$nom)(givenName=$prenom)(supannMailPerso=$emailPerso))";
       $user_entry_etu_or_pro = ldap_search($link, $racine, $filter4);
-      $info = ldap_get_entries($link,$user_entry_etu_or_pro);
-      $entry = ldap_first_entry($link,$user_entry_etu_or_pro);
+      $info = ldap_get_entries($link, $user_entry_etu_or_pro);
+      $entry = ldap_first_entry($link, $user_entry_etu_or_pro);
       echo "entry :"."$entry"."\n";
-      $userdn = ldap_get_dn($link,$entry);
-      for ($i=0; $i < $info['count']; $i++) {
-      $login = $info[$i]["uid"][0];
-      $usersec = $info[$i]["userpassword"][0];
-      echo "$login : ";
-      echo "$userdn"."\n";
-      echo "$usersec";
-  }
+      $userdn = ldap_get_dn($link, $entry);
+    for ($i=0; $i < $info['count']; $i++) {
+        $login = $info[$i]["uid"][0];
+        $usersec = $info[$i]["userpassword"][0];
+        echo "$login : ";
+        echo "$userdn"."\n";
+        echo "$usersec";
+    }
 }
 
-   $temp_pwd = passgen();
+    $temp_pwd = passgen();
    // echo "$temp_pwd"."\n";
     $temp_ldap_pwd = password_hash($temp_pwd, PASSWORD_DEFAULT);
     echo "le nouveau mot de passe est : "."$temp_pwd"."\n";
     $temp_AD_pwd = "\"".$temp_pwd."\"";
     $userattr = [
 
-				[	"attrib" => "userpassword",
-					"modtype" => LDAP_MODIFY_BATCH_REMOVE,
-					"values" => ["$usersec"],
-				],
+      [ "attrib" => "userpassword",
+      "modtype" => LDAP_MODIFY_BATCH_REMOVE,
+      "values" => ["$usersec"],
+      ],
 
-				[ "attrib" => "userpassword",
-					"modtype" => LDAP_MODIFY_BATCH_ADD,
-					"values" => ["$temp_ldap_pwd"],
-				],  
+      [ "attrib" => "userpassword",
+      "modtype" => LDAP_MODIFY_BATCH_ADD,
+       "values" => ["$temp_ldap_pwd"],
+      ],  
 
-					];
+    ];
     echo "$user_attr_passwd";
     $r = ldap_modify_batch($link, $userdn, $userattr);
 
     if (!$r) {
-      
-      $result = $messages['couldnotresetldappswd'];
-      echo "$result";
-      exit();
+  
+        $result = $messages['couldnotresetldappswd'];
+        echo "$result";
+        exit();
     } else {
-      $result = $messages['passwordreset'];
-      echo "$result";
+        $result = $messages['passwordreset'];
+        echo "$result";
 
     }
 
