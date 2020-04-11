@@ -24,7 +24,7 @@ ini_set('log_errors', 1);
 
 error_reporting(E_ALL);
 
- 
+
 
 // Decclaration des variables
 
@@ -32,19 +32,19 @@ $passwordalg = "ssha";
 
 //ratachement de fichiers
 
- 
 
-include "ldap_bind.php";
 
-include "messages.php";
+require "ldap_bind.php";
 
-include "functions.php";
+require "messages.php";
 
-include "Ad_bind_2012.php";
+require "functions.php";
 
-include "Ad_connect_2012.php";
+require "Ad_bind_2012.php";
 
- 
+require "Ad_connect_2012.php";
+
+
 
 //ON recupère les donnees du formulaire
 
@@ -58,7 +58,7 @@ if (!empty($_POST['username']) && (!empty($_POST['password']) && (!empty($_POST[
 
   $newPassword2 = $_POST['newPassword2'];
 
- 
+  
 
     // On retire les slashs rajoutés par PHP
 
@@ -70,7 +70,7 @@ if (!empty($_POST['username']) && (!empty($_POST['password']) && (!empty($_POST[
 
   $username = stripslashes($username);
 
- 
+  
 
     //on fait de ces variables des variable de session
 
@@ -86,19 +86,19 @@ if (!empty($_POST['username']) && (!empty($_POST['password']) && (!empty($_POST[
 
  
 
-                $result = $messages['completeinfo'];
+  $result = $messages['completeinfo'];
 
-                echo "$result";
+  echo "$result";
 
-                exit();
+  exit();
 
 }
 
- 
+
 
 //Verification de la disponibilité du serveur AD à l'aide d'un ping
 
- 
+
 
 $ping=exec('/bin/ping -c1 -q -w1 '.$ADserver.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
 
@@ -114,7 +114,7 @@ if ($ping !=0) {
 
 }
 
- 
+
 
 if ($ADbind == false) {
 
@@ -130,7 +130,7 @@ if ($ADbind == false) {
 
 //Vérification de la disponibilité du serveur Openldap à l'aide d'un  ping
 
- 
+
 
 $ping=exec('/bin/ping -c1 -q -w1 '.$server.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
 
@@ -138,21 +138,21 @@ sleep(1);
 
 if ($ping !=0) {
 
-                $result = $messages['noldapserver'];
+  $result = $messages['noldapserver'];
 
- echo "$result";
+  echo "$result";
 
- exit();
+  exit();
 
 }
 
- 
+
 
 $hash_password = password_hash($password,CRYPT_SHA512);
 
 $Password = $hash_password;
 
- 
+
 
 $filter ="(|(uid=$username))";
 
@@ -170,7 +170,7 @@ if ($eval==0) {
 
   exit();
 
- 
+  
 
 } else {
 
@@ -184,7 +184,7 @@ if ($eval==0) {
 
   if (password_verify($Password,$oldPassword)) {
 
- 
+   
 
     $renewPassword = hash('sha512', $newPassword1);
     
@@ -193,17 +193,17 @@ if ($eval==0) {
     $r = ldap_mod_replace($link, $userdn,$userpsswd);
     
     if (!$r){
-  
-  $result=$messages['couldnotresetldappswd'];
-  
-  echo "$result";
-  exit();
+      
+      $result=$messages['couldnotresetldappswd'];
+      
+      echo "$result";
+      exit();
 
-}else{
-  $result=$messages['passwordreset'];
- 
-  echo  "$result";
-}
+    }else{
+      $result=$messages['passwordreset'];
+      
+      echo  "$result";
+    }
 
   //  $result = $messages['tokensent'];
 
