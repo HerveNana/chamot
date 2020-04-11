@@ -25,7 +25,7 @@ $password = "";
 $newPassword1 = "";
 $newPassword2 = "";
 $title = "Chamot initialisation et gestion du mot de passe";
-
+?>
 
 
 <!DOCTYPE html>
