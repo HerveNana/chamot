@@ -115,7 +115,7 @@ function make_ad_password($password) {
     $len = strlen(utf8_decode($password));
     $adpassword = "";
     for ($i = 0; $i < $len; $i++){
-        $adpassword .= "{$password{$i}}\000";
+        $adpassword .= "{$password[$i]}\000";
     }
     return $adpassword;
 }
