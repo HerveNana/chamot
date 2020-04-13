@@ -85,7 +85,6 @@ if (!empty($_POST['username']) && (!empty($_POST['password']) && (!empty($_POST[
 } else {
 
  
-
   $result = $messages['completeinfo'];
 
   echo "$result";
@@ -95,9 +94,7 @@ if (!empty($_POST['username']) && (!empty($_POST['password']) && (!empty($_POST[
 }
 
 
-
 //Verification de la disponibilité du serveur AD à l'aide d'un ping
-
 
 
 $ping=exec('/bin/ping -c1 -q -w1 '.$ADserver.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
@@ -131,7 +128,6 @@ if ($ADbind == false) {
 //Vérification de la disponibilité du serveur Openldap à l'aide d'un  ping
 
 
-
 $ping=exec('/bin/ping -c1 -q -w1 '.$server.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
 
 sleep(1);
@@ -146,13 +142,14 @@ if ($ping !=0) {
 
 }
 
-
+/*
 
 $hash_password = password_hash($password,CRYPT_SHA512);
 
 $Password = $hash_password;
+*/
 
-
+//  On vérifie l'existence en base lDAP du login  renseigné par l'utilisateur
 
 $filter ="(|(uid=$username))";
 
@@ -162,31 +159,34 @@ $retour = ldap_get_entries($link, $fu);
 
 $eval = $retour["count"];
 
-if ($eval==0) {
+if ($eval==0) {       // Si le login n'exite pas, on renvoi un message d'erreur
 
   $result = $messages['noExistingLogin'];
 
   echo "$result";
 
   exit();
-
   
 
-} else {
+} else {        //Si le login est présent en base on tente une connexion ldap avec le mot de passe renseigné.
 
-  for ($i=0; $i < $retour['count'] ; $i++) {
+  $userdn = 'uid='."$username".','.'ou=People,dc=univ-guyane,dc=fr';
+ // options=ldap_set_option($link, LDAP_OPT_PROTOCOL_VERSION, 3);
+  $userbind = ldap_bind($link,$userdn,$password);
+  
+  if (!$userbind)  {
+    
+  $result = $messages['wrongOldPassword'];
 
-    $oldPassword = $retour[$i]["userpassword"][0];
+    echo "$result" . "\n";
 
-    echo "l'ancien mot de passe est :"."$oldPassword"."\n"."\n";
+    echo "$password";
 
-  }
+    exit();
 
-  if (password_verify($Password,$oldPassword)) {
-
-   
-
-    $renewPassword = hash('sha512', $newPassword1);
+  } else  {
+    
+    $renewPassword = make_sha_256_password($newPassword2);
     
     $userpsswd["userPassword"] = $renewPassword;      
     
@@ -204,23 +204,7 @@ if ($eval==0) {
       
       echo  "$result";
     }
-
-  //  $result = $messages['tokensent'];
-
-  //  echo "$result";
-
-  } else {
-
-    $result = $messages['wrongOldPassword'];
-
-    echo "$result" . "\n";
-
-    echo "$Password";
-
-    exit();
-
   }
-
 }
 /*
 $r=true;
