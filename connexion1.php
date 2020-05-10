@@ -186,11 +186,11 @@ if ($eval==0) {       // Si le login n'exite pas, on renvoi un message d'erreur
 
   } else  {
     
-    $renewPassword = make_sha_256_password($newPassword2);
+    $renewPassword = make_ssha_password($newPassword2);
     
     $userpsswd["userPassword"] = $renewPassword;      
     
-    $r = ldap_mod_replace($link, $userdn,$userpsswd);
+    $r = ldap_mod_replace($link,$userdn,array('userPassword' => "$userpsswd"));
     
     if (!$r){
       
