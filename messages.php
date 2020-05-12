@@ -89,6 +89,7 @@ $messages['noldapserver'] = "Il est impossible de se connecter au serveur! Veuil
 $messages['bindnotavailable'] = "connection au référentiel windows impossible! Veuillez contacter le service informatique";
 $messages['completeinfo'] = "veuillez remplir tous les champs afin de pouvoir continuer";
 $messages['usernotexist'] = "je ne vous est pas trouvé dans la base veuillez recommencer ou contacter le service informatique";
+$messages['noidenticalpasswd'] = "Votre nouveau mot de passe et sa confirmation sont different veuillez recommencer.";
 $messages['multipleaccount'] = "Vous disposez de plusieurs comptes. Veuillez sélectionner le compte pour lequel vous souhaitez obtenir un mot de passe provisoire.";
 $messages['couldnotresetldappswd'] = "Votre mot de passe n'a pas pu être réinitialisé. Veuillez recommencer ou contacter le service informatique.";
 $messages['couldnotresetwinpasswd'] = "Votre mot de passe windows n'a pas pu être réinitialisé. Veuillez recommencer ou contacter le service informatique";

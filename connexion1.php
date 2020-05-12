@@ -59,6 +59,16 @@ if (!empty($_POST['username']) && (!empty($_POST['password']) && (!empty($_POST[
   $newPassword2 = $_POST['newPassword2'];
 
   
+  // On vérifie que les nouveaux mots de passe sont iidentiques 
+
+  if ($newPassword1 !== $newPassword2) {
+
+    $result = $messages['noidenticalpasswd'];
+   
+    echo "$result";
+   
+    exit;  
+  }
 
     // On retire les slashs rajoutés par PHP
 
@@ -186,11 +196,15 @@ if ($eval==0) {       // Si le login n'exite pas, on renvoi un message d'erreur
 
   } else  {
     
-    $renewPassword = make_ssha_password($newPassword2);
+    $renewPassword = make_sha_password($newPassword2);
     
-    $userpsswd["userPassword"] = $renewPassword;      
+    //$userpsswd["userPassword"] = $renewPassword;      
     
-    $r = ldap_mod_replace($link,$userdn,array('userPassword' => "$userpsswd"));
+   // $r = ldap_mod_replace($link,$userdn,array('userPassword' => "$userpsswd"));
+   $rbind = ldap_bind($link,$rootdn,$rootpw);
+   
+    $r = ldap_mod_replace($link,$userdn,array('userPassword' => "$renewPassword"));
+
     
     if (!$r){
       

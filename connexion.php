@@ -180,7 +180,8 @@ if ($eval == 1 && $account !== "") {
 
     $temp_pwd = passgen();
    // echo "$temp_pwd"."\n";
-    $temp_ldap_pwd = password_hash($temp_pwd, PASSWORD_DEFAULT);
+    //$temp_ldap_pwd = password_hash($temp_pwd, PASSWORD_DEFAULT);
+    $temp_ldap_pwd = make_sha_password($temp_pwd);
     echo "le nouveau mot de passe est : "."$temp_pwd"."\n";
     $temp_AD_pwd = "\"".$temp_pwd."\"";
     $userattr = [
