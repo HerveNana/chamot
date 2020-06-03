@@ -48,9 +48,9 @@ if (!empty($_POST['prenom']) && (!empty($_POST['nom']) && (!empty($_POST['mail']
 
 //On vérifie la disponibilité des serveur LDAP et Active Directory
 
-$ping=exec('/bin/ping -c1 -q -w1 '.$ADserver.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
+$ping=exec('/bin/ping -c2 -q -w2 '.$ADserver.' | grep transmitted | cut -f3 -d"," | cut -f2 -d"," | cut -f1 -d"%"');
 sleep(1);
-if ($ping !=0) {
+if ($ping !==0) {
     $result = $messages['noadserver']; 
     echo "$result"; 
     exit();
